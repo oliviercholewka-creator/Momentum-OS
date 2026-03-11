@@ -1,458 +1,469 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Momentum OS | Execution Dashboard</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #09090b;
-            --card-bg: #18181b;
-            --border: #27272a;
-            --text-main: #fafafa;
-            --text-dim: #a1a1aa;
-            --accent: #3b82f6;
-            --accent-glow: rgba(59, 130, 246, 0.5);
-            --success: #10b981;
-            --radius: 12px;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Momentum OS</title>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-        body {
-            background-color: var(--bg);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            line-height: 1.6;
-            padding: 40px 20px;
-        }
+<style>
 
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-        }
+:root{
+--bg:#09090b;
+--card-bg:#18181b;
+--border:#27272a;
+--text:#fafafa;
+--text-dim:#a1a1aa;
+--accent:#3b82f6;
+--success:#10b981;
+}
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 20px;
-        }
+*{box-sizing:border-box;margin:0;padding:0;}
 
-        h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; }
-        h2 { font-size: 1.1rem; margin-bottom: 1.5rem; color: var(--text-main); }
+body{
+font-family:Inter,sans-serif;
+background:var(--bg);
+color:var(--text);
+padding:40px 20px;
+}
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(12, 1fr);
-            gap: 20px;
-        }
+.container{
+max-width:1100px;
+margin:auto;
+}
 
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 24px;
-            transition: transform 0.2s ease, border-color 0.2s ease;
-        }
+header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:40px;
+border-bottom:1px solid var(--border);
+padding-bottom:20px;
+}
 
-        .card:hover { border-color: #3f3f46; }
+.grid{
+display:grid;
+grid-template-columns:repeat(12,1fr);
+gap:20px;
+}
 
-        .col-8 { grid-column: span 8; }
-        .col-4 { grid-column: span 4; }
-        .col-6 { grid-column: span 6; }
-        .col-12 { grid-column: span 12; }
+.card{
+background:var(--card-bg);
+border:1px solid var(--border);
+border-radius:12px;
+padding:24px;
+}
 
-        /* Momentum Tracker Table */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
+.col-8{grid-column:span 8;}
+.col-6{grid-column:span 6;}
+.col-4{grid-column:span 4;}
+.col-12{grid-column:span 12;}
 
-        th { text-align: left; color: var(--text-dim); padding-bottom: 12px; font-weight: 400; }
-        td { padding: 12px 0; border-top: 1px solid var(--border); }
-        .momentum-up { color: var(--success); font-weight: 600; }
+h2{margin-bottom:15px;}
 
-        /* Progress Bars */
-        .progress-container { margin-bottom: 15px; }
-        .progress-label { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 6px; }
-        .progress-bar {
-            height: 6px;
-            background: var(--border);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        .progress-fill { height: 100%; background: var(--accent); border-radius: 10px; transition: width 1s ease-in-out; }
+table{
+width:100%;
+border-collapse:collapse;
+}
 
-        /* Input Styling */
-        input, select, textarea {
-            background: #09090b;
-            border: 1px solid var(--border);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 6px;
-            width: 100%;
-            margin-bottom: 10px;
-            outline: none;
-        }
+th,td{
+padding:10px 0;
+border-top:1px solid var(--border);
+text-align:left;
+}
 
-        button {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: opacity 0.2s;
-        }
+input,select,textarea{
+background:#09090b;
+border:1px solid var(--border);
+color:white;
+padding:8px;
+border-radius:6px;
+width:100%;
+margin-bottom:10px;
+}
 
-        button:hover { opacity: 0.9; }
-        .btn-outline { background: transparent; border: 1px solid var(--border); }
+button{
+background:var(--accent);
+border:none;
+padding:10px 14px;
+color:white;
+border-radius:6px;
+cursor:pointer;
+}
 
-        /* Timer Section */
-        #timer-display {
-            font-size: 3rem;
-            font-weight: 700;
-            text-align: center;
-            margin: 20px 0;
-            font-variant-numeric: tabular-nums;
-        }
+.btn-outline{
+background:none;
+border:1px solid var(--border);
+}
 
-        .active-session {
-            border-color: var(--accent);
-            box-shadow: 0 0 20px var(--accent-glow);
-        }
+.progress-bar{
+height:6px;
+background:var(--border);
+border-radius:10px;
+overflow:hidden;
+}
 
-        /* Anti-Procrastination */
-        #procrastination-panel {
-            display: none;
-            margin-top: 15px;
-            padding: 15px;
-            background: #27272a;
-            border-radius: 8px;
-        }
+.progress-fill{
+height:100%;
+background:var(--accent);
+}
 
-        .tag {
-            background: var(--border);
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            color: var(--text-dim);
-        }
+#timer-display{
+font-size:3rem;
+text-align:center;
+margin:20px 0;
+}
 
-        @media (max-width: 768px) {
-            .col-4, .col-8, .col-6 { grid-column: span 12; }
-        }
-    </style>
+.active-session{
+border-color:var(--accent);
+box-shadow:0 0 20px rgba(59,130,246,.4);
+}
+
+.tag{
+background:var(--border);
+padding:4px 8px;
+border-radius:4px;
+font-size:.75rem;
+}
+
+@media(max-width:768px){
+.col-4,.col-6,.col-8{grid-column:span 12;}
+}
+
+</style>
 </head>
+
 <body>
 
 <div class="container">
-    <header>
-        <div>
-            <h1>MOMENTUM OS</h1>
-            <p id="identity-banner" style="color: var(--text-dim); font-size: 0.85rem;">Select your identity to begin...</p>
-        </div>
-        <select id="identity-select" style="width: auto; margin-bottom: 0;" onchange="updateIdentity()">
-            <option value="">Choose Identity</option>
-            <option value="Builder">Builder</option>
-            <option value="Scholar">Scholar</option>
-            <option value="Athlete">Athlete</option>
-            <option value="Trader">Trader</option>
-        </select>
-    </header>
 
-    <div class="grid">
-        <div class="card col-8">
-            <h2>Momentum Tracker</h2>
-            <table>
-                <thead>
-                    <tr><th>Day</th><th>Tasks</th><th>Score</th></tr>
-                </thead>
-                <tbody>
-                    <tr><td>Monday</td><td>5 Tasks</td><td class="momentum-up">+10 Momentum</td></tr>
-                    <tr><td>Tuesday</td><td>2 Tasks</td><td class="momentum-up">+3 Momentum</td></tr>
-                    <tr><td>Wednesday</td><td>7 Tasks</td><td class="momentum-up">+15 Momentum</td></tr>
-                </tbody>
-            </table>
-            <div class="progress-container" style="margin-top: 20px;">
-                <div class="progress-label"><span>Weekly Velocity</span><span>68%</span></div>
-                <div class="progress-bar"><div class="progress-fill" style="width: 68%;"></div></div>
-            </div>
-        </div>
+<header>
 
-        <div class="card col-4">
-            <h2>Life Dashboard</h2>
-            <div class="progress-container">
-                <div class="progress-label"><span>Health</span><span>70%</span></div>
-                <div class="progress-bar"><div class="progress-fill" style="width: 70%; background: #ef4444;"></div></div>
-            </div>
-            <div class="progress-container">
-                <div class="progress-label"><span>Learning</span><span>50%</span></div>
-                <div class="progress-bar"><div class="progress-fill" style="width: 50%;"></div></div>
-            </div>
-            <div class="progress-container">
-                <div class="progress-label"><span>Work</span><span>90%</span></div>
-                <div class="progress-bar"><div class="progress-fill" style="width: 90%; background: var(--success);"></div></div>
-            </div>
-            <div class="progress-container">
-                <div class="progress-label"><span>Finance</span><span>40%</span></div>
-                <div class="progress-bar"><div class="progress-fill" style="width: 40%; background: #f59e0b;"></div></div>
-            </div>
-        </div>
+<div>
+<h1>MOMENTUM OS</h1>
+<p id="identity-banner" style="color:var(--text-dim);font-size:.9rem;">
+Select your identity to begin...
+</p>
+</div>
 
-        <div class="card col-6" id="execution-card">
-            <h2>Today's Execution</h2>
-            <div style="margin-bottom: 20px;">
-                <label style="font-size: 0.8rem; color: var(--text-dim);">Top 3 Intentions</label>
-                <input type="text" placeholder="1. High impact task...">
-                <input type="text" placeholder="2. Secondary objective...">
-                <input type="text" placeholder="3. Maintenance task...">
-            </div>
-            <div id="timer-display">25:00</div>
-            <div style="display: flex; gap: 10px;">
-                <button id="start-btn" onclick="toggleTimer()" style="flex: 2;">Start Focus Session</button>
-                <button class="btn-outline" onclick="resetTimer()" style="flex: 1;">Reset</button>
-            </div>
-        </div>
+<select id="identity-select" onchange="updateIdentity()">
+<option value="">Choose Identity</option>
+<option>Builder</option>
+<option>Scholar</option>
+<option>Athlete</option>
+<option>Trader</option>
+</select>
 
-        <div class="card col-6">
-            <h2>Resistance Solver</h2>
-            <p style="color: var(--text-dim); margin-bottom: 15px;">Friction is the enemy of momentum.</p>
-            <button class="btn-outline" onclick="showHelp()">I can't start</button>
-            
-            <div id="procrastination-panel">
-                <p style="margin-bottom: 10px;">Why can't you start?</p>
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button class="btn-outline" style="font-size: 0.8rem;" onclick="solve('hard')">Too Hard</button>
-                    <button class="btn-outline" style="font-size: 0.8rem;" onclick="solve('boring')">Too Boring</button>
-                    <button class="btn-outline" style="font-size: 0.8rem;" onclick="solve('overwhelmed')">Overwhelmed</button>
-                </div>
-                <p id="solver-output" style="margin-top: 15px; font-weight: 600; color: var(--accent);"></p>
-            </div>
-        </div>
+</header>
 
-        <div class="card col-8">
-            <h2>Minimum Action System</h2>
-            <table id="min-action-table">
-                <thead>
-                    <tr><th>Goal</th><th>Minimum Action (Unskippable)</th></tr>
-                </thead>
-                <tbody id="min-action-body">
-                    <tr><td>Learn Spanish</td><td><span class="tag">5 words</span></td></tr>
-                    <tr><td>Workout</td><td><span class="tag">5 pushups</span></td></tr>
-                </tbody>
-            </table>
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <input id="new-goal" type="text" placeholder="Goal" style="margin-bottom: 0;">
-                <input id="new-action" type="text" placeholder="Min. Action" style="margin-bottom: 0;">
-                <button onclick="addRow()">Add</button>
-            </div>
-        </div>
+<div class="grid">
 
-        <div class="card col-4">
-            <h2>Focus Room</h2>
-            <label style="font-size: 0.8rem; color: var(--text-dim);">Ambience</label>
-            <select>
-                <option>Silence</option>
-                <option>Rainy Night</option>
-                <option>Deep Space</option>
-                <option>Coffee Shop</option>
-            </select>
-            <div style="margin-top: 20px; text-align: center;">
-                <p style="font-size: 0.8rem; color: var(--text-dim);">Completed Today</p>
-                <p style="font-size: 2rem; font-weight: 700;">4 Sessions</p>
-            </div>
-        </div>
+<!-- MOMENTUM TRACKER -->
 
-        <div class="card col-12">
-            <h2>Weekly Review & Report</h2>
-            <div class="grid" style="gap: 15px;">
-                <div class="col-4">
-                    <label style="font-size: 0.8rem;">What went well?</label>
-                    <textarea rows="3"></textarea>
-                </div>
-                <div class="col-4">
-                    <label style="font-size: 0.8rem;">What failed?</label>
-                    <textarea rows="3"></textarea>
-                </div>
-                <div class="col-4" style="background: #27272a; padding: 15px; border-radius: 8px;">
-                    <h3 style="font-size: 0.9rem; margin-bottom: 10px;">Generated Report</h3>
-                    <p style="font-size: 0.8rem;">Productivity: <b>84%</b></p>
-                    <p style="font-size: 0.8rem;">Focus Hours: <b>12.5 hrs</b></p>
-                    <p style="font-size: 0.8rem;">Tasks: <b>28 Completed</b></p>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="card col-8">
+
+<h2>Momentum Tracker</h2>
+
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+
+<input id="momentum-date" type="date">
+<input id="momentum-tasks" type="number" placeholder="Tasks completed">
+<input id="momentum-score" type="number" placeholder="Momentum score">
+
+<button onclick="addMomentum()">Add Entry</button>
+<button class="btn-outline" onclick="setToday()">Today</button>
+
+</div>
+
+<table>
+
+<thead>
+<tr>
+<th>Date</th>
+<th>Tasks</th>
+<th>Score</th>
+</tr>
+</thead>
+
+<tbody id="momentum-body"></tbody>
+
+</table>
+
+</div>
+
+<!-- LIFE DASHBOARD -->
+
+<div class="card col-4">
+
+<h2>Life Dashboard</h2>
+
+<p>Health</p>
+<div class="progress-bar"><div class="progress-fill" style="width:70%"></div></div>
+
+<p style="margin-top:10px">Learning</p>
+<div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
+
+<p style="margin-top:10px">Work</p>
+<div class="progress-bar"><div class="progress-fill" style="width:90%"></div></div>
+
+</div>
+
+<!-- EXECUTION -->
+
+<div class="card col-6" id="execution-card">
+
+<h2>Today's Execution</h2>
+
+<input placeholder="1. High impact task">
+<input placeholder="2. Secondary objective">
+<input placeholder="3. Maintenance task">
+
+<div id="timer-display">25:00</div>
+
+<div style="display:flex;gap:10px">
+<button id="start-btn" onclick="toggleTimer()">Start Focus Session</button>
+<button class="btn-outline" onclick="resetTimer()">Reset</button>
+</div>
+
+</div>
+
+<!-- FOCUS ROOM -->
+
+<div class="card col-6">
+
+<h2>Focus Room</h2>
+
+<p>Completed Today</p>
+<p id="session-count" style="font-size:2rem">0 Sessions</p>
+
+</div>
+
+<!-- MINIMUM ACTION -->
+
+<div class="card col-12">
+
+<h2>Minimum Action System</h2>
+
+<table>
+
+<thead>
+<tr>
+<th>Goal</th>
+<th>Minimum Action</th>
+</tr>
+</thead>
+
+<tbody id="min-action-body"></tbody>
+
+</table>
+
+<div style="display:flex;gap:10px;margin-top:10px">
+
+<input id="new-goal" placeholder="Goal">
+<input id="new-action" placeholder="Minimum Action">
+
+<button onclick="addRow()">Add</button>
+
+</div>
+
+</div>
+
+</div>
 </div>
 
 <script>
-let timeLeft = 1500;
-let timerId = null;
-let sessionsCompleted = 0;
 
-// LOAD SAVED DATA
-window.onload = () => {
+let timeLeft=1500
+let timerId=null
+let sessionsCompleted=0
 
-    // Restore Identity
-    const savedIdentity = localStorage.getItem('userIdentity');
-    if (savedIdentity) {
-        document.getElementById('identity-select').value = savedIdentity;
-        updateIdentity();
-    }
+window.onload=()=>{
 
-    // Restore Minimum Actions
-    const savedActions = JSON.parse(localStorage.getItem('minActions'));
-    if (savedActions && savedActions.length > 0) {
-        const tbody = document.getElementById('min-action-body');
-        tbody.innerHTML = "";
+renderMomentum()
 
-        savedActions.forEach(item => {
-            tbody.innerHTML += `
-            <tr>
-                <td>${item.goal}</td>
-                <td><span class="tag">${item.action}</span></td>
-            </tr>`;
-        });
-    }
+const savedIdentity=localStorage.getItem("userIdentity")
 
-    updateTimerDisplay();
-};
-
-// IDENTITY SYSTEM
-function updateIdentity() {
-    const select = document.getElementById('identity-select');
-    const banner = document.getElementById('identity-banner');
-
-    if (select.value) {
-        banner.innerHTML =
-            `You are acting as a <b style="color:var(--accent)">${select.value}</b> today.`;
-        localStorage.setItem('userIdentity', select.value);
-    } else {
-        banner.textContent = "Select your identity to begin...";
-        localStorage.removeItem('userIdentity');
-    }
+if(savedIdentity){
+document.getElementById("identity-select").value=savedIdentity
+updateIdentity()
 }
 
-// MINIMUM ACTION SYSTEM
-function addRow() {
+const savedActions=JSON.parse(localStorage.getItem("minActions"))||[]
 
-    const goal = document.getElementById('new-goal').value.trim();
-    const action = document.getElementById('new-action').value.trim();
+const tbody=document.getElementById("min-action-body")
 
-    if (!goal || !action) return;
+savedActions.forEach(a=>{
+tbody.innerHTML+=`
+<tr>
+<td>${a.goal}</td>
+<td><span class="tag">${a.action}</span></td>
+</tr>`
+})
 
-    const tbody = document.getElementById('min-action-body');
+updateTimerDisplay()
 
-    tbody.innerHTML += `
-    <tr>
-        <td>${goal}</td>
-        <td><span class="tag">${action}</span></td>
-    </tr>`;
-
-    const saved = JSON.parse(localStorage.getItem('minActions')) || [];
-    saved.push({ goal, action });
-
-    localStorage.setItem('minActions', JSON.stringify(saved));
-
-    document.getElementById('new-goal').value = "";
-    document.getElementById('new-action').value = "";
 }
 
-// TIMER
-function updateTimerDisplay() {
+function updateIdentity(){
 
-    const mins = Math.floor(timeLeft / 60);
-    const secs = timeLeft % 60;
+const select=document.getElementById("identity-select")
+const banner=document.getElementById("identity-banner")
 
-    document.getElementById('timer-display').textContent =
-        `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+if(select.value){
+
+banner.innerHTML=`You are acting as a <b style="color:#3b82f6">${select.value}</b> today.`
+
+localStorage.setItem("userIdentity",select.value)
+
+}else{
+
+banner.innerText="Select your identity to begin..."
+localStorage.removeItem("userIdentity")
+
 }
 
-function toggleTimer() {
-
-    const btn = document.getElementById('start-btn');
-    const card = document.getElementById('execution-card');
-
-    if (timerId) {
-
-        clearInterval(timerId);
-        timerId = null;
-
-        btn.textContent = "Start Focus Session";
-        card.classList.remove('active-session');
-
-    } else {
-
-        btn.textContent = "Pause Session";
-        card.classList.add('active-session');
-
-        timerId = setInterval(() => {
-
-            timeLeft--;
-            updateTimerDisplay();
-
-            if (timeLeft <= 0) {
-
-                clearInterval(timerId);
-                timerId = null;
-
-                sessionsCompleted++;
-
-                document.querySelector(".card.col-4 p:nth-child(2)").textContent =
-                    sessionsCompleted + " Sessions";
-
-                alert("Focus session complete!");
-
-                resetTimer();
-            }
-
-        }, 1000);
-    }
 }
 
-function resetTimer() {
+function addRow(){
 
-    clearInterval(timerId);
-    timerId = null;
+const goal=document.getElementById("new-goal").value.trim()
+const action=document.getElementById("new-action").value.trim()
 
-    timeLeft = 1500;
+if(!goal||!action)return
 
-    updateTimerDisplay();
+const saved=JSON.parse(localStorage.getItem("minActions"))||[]
 
-    document.getElementById('start-btn').textContent = "Start Focus Session";
-    document.getElementById('execution-card').classList.remove('active-session');
+saved.push({goal,action})
+
+localStorage.setItem("minActions",JSON.stringify(saved))
+
+location.reload()
+
 }
 
-// PROCRASTINATION SOLVER
-function showHelp() {
-    document.getElementById('procrastination-panel').style.display = "block";
+function updateTimerDisplay(){
+
+const mins=Math.floor(timeLeft/60)
+const secs=timeLeft%60
+
+document.getElementById("timer-display").textContent=
+`${mins.toString().padStart(2,"0")}:${secs.toString().padStart(2,"0")}`
+
 }
 
-function solve(type) {
+function toggleTimer(){
 
-    const output = document.getElementById('solver-output');
+const btn=document.getElementById("start-btn")
+const card=document.getElementById("execution-card")
 
-    const tips = {
-        hard: "Do the ugly version for 5 minutes. Momentum beats perfection.",
-        boring: "Turn it into a speed challenge: how much can you finish in 10 minutes?",
-        overwhelmed: "Break the task down until the first step takes under 60 seconds."
-    };
+if(timerId){
 
-    output.textContent = tips[type];
+clearInterval(timerId)
+timerId=null
+btn.textContent="Start Focus Session"
+card.classList.remove("active-session")
+
+}else{
+
+btn.textContent="Pause Session"
+card.classList.add("active-session")
+
+timerId=setInterval(()=>{
+
+timeLeft--
+updateTimerDisplay()
+
+if(timeLeft<=0){
+
+clearInterval(timerId)
+timerId=null
+
+sessionsCompleted++
+
+document.getElementById("session-count").textContent=
+sessionsCompleted+" Sessions"
+
+alert("Focus session complete!")
+
+resetTimer()
+
 }
+
+},1000)
+
+}
+
+}
+
+function resetTimer(){
+
+clearInterval(timerId)
+timerId=null
+timeLeft=1500
+updateTimerDisplay()
+
+document.getElementById("execution-card").classList.remove("active-session")
+document.getElementById("start-btn").textContent="Start Focus Session"
+
+}
+
+function setToday(){
+
+const today=new Date().toISOString().split("T")[0]
+
+document.getElementById("momentum-date").value=today
+
+}
+
+function addMomentum(){
+
+const date=document.getElementById("momentum-date").value
+const tasks=document.getElementById("momentum-tasks").value
+const score=document.getElementById("momentum-score").value
+
+if(!date||!tasks||!score)return
+
+const stored=JSON.parse(localStorage.getItem("momentumData"))||[]
+
+stored.push({date,tasks,score})
+
+stored.sort((a,b)=>new Date(b.date)-new Date(a.date))
+
+localStorage.setItem("momentumData",JSON.stringify(stored))
+
+renderMomentum()
+
+document.getElementById("momentum-tasks").value=""
+document.getElementById("momentum-score").value=""
+
+}
+
+function renderMomentum(){
+
+const tbody=document.getElementById("momentum-body")
+
+tbody.innerHTML=""
+
+const stored=JSON.parse(localStorage.getItem("momentumData"))||[]
+
+stored.forEach(item=>{
+
+const date=new Date(item.date).toLocaleDateString()
+
+tbody.innerHTML+=`
+<tr>
+<td>${date}</td>
+<td>${item.tasks}</td>
+<td style="color:#10b981">+${item.score}</td>
+</tr>
+`
+
+})
+
+}
+
 </script>
 
 </body>
