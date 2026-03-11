@@ -2,10 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Momentum OS | Deep Work Engine</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>Momentum OS</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -188,6 +185,7 @@
         }
 
         .hidden { display: none !important; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
     </style>
 </head>
 <body>
@@ -195,32 +193,37 @@
 <div id="auth-overlay">
     <div class="auth-card">
         <h2 id="auth-title">Welcome Back</h2>
-        <div class="auth-input-group">
-            <label>Email</label>
-            <input type="email" id="auth-email">
-        </div>
-        <div class="auth-input-group">
-            <label>Password</label>
-            <input type="password" id="auth-password">
-        </div>
-        <button id="log-btn" onclick="handleAuth()">Continue</button>
-        <div class="auth-toggle">
-            <span id="toggle-text" onclick="toggleAuthMode()">Don't have an account? Sign Up</span>
-        </div>
+        <input type="email" id="auth-email" placeholder="Email">
+        <input type="password" id="auth-password" placeholder="Password">
+        <button onclick="handleAuth()">Continue</button>
+        <p style="cursor:pointer; font-size: 0.8rem; margin-top: 15px;" onclick="toggleAuthMode()" id="toggle-text">Don't have an account? Sign Up</p>
     </div>
 </div>
 
 <div class="container">
+    <h1>MOMENTUM OS</h1>
+    <div class="entry-section">
+        <input type="date" id="task-date">
+        <input type="text" id="task-name" placeholder="Task Name">
+        <input type="number" id="task-time" placeholder="Minutes">
+        <button id="log-btn" onclick="addTask()">LOG</button>
     </div>
+    <table>
+        <thead><tr><th>Date</th><th>Task</th><th>Time</th><th>Momentum</th></tr></thead>
+        <tbody id="table-body"></tbody>
+    </table>
+    <h2 id="total-score-display">0</h2>
+</div>
 
 <script>
-    // 1. INITIALIZE SUPABASE
+    // 1. Initialize Supabase
+    // REPLACE WITH YOUR NEW KEYS
     const supabase = supabase.createClient('https://gmyveydvfikustdfsndv.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdteXZleWR2ZmlrdXN0ZGZzbmR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNjIzOTIsImV4cCI6MjA4ODgzODM5Mn0.Qt90bt8OOAb1u26cEupc7HSY50Yz4OaDYWlOhNPOR-M');
     
-    let tasks = [];
     let isSignUp = false;
+    let tasks = [];
 
-    // 2. AUTHENTICATION LOGIC
+    // 2. Authentication Logic
     function toggleAuthMode() {
         isSignUp = !isSignUp;
         document.getElementById('auth-title').innerText = isSignUp ? "Create Account" : "Welcome Back";
@@ -236,45 +239,29 @@
             if (error) alert(error.message); else alert("Check your email!");
         } else {
             const { error } = await supabase.auth.signInWithPassword({ email, password });
-            if (error) alert("Invalid credentials");
+            if (error) alert("Invalid login");
+            else location.reload();
         }
     }
 
-    // 3. DATABASE LOGIC
+    // 3. Database Logic
     async function fetchTasks() {
-        const { data, error } = await supabase
-            .from('tasks')
-            .select('*')
-            .order('created_at', { ascending: false });
-
+        const { data, error } = await supabase.from('tasks').select('*').order('date', { ascending: false });
         if (error) console.error(error);
-        else {
-            tasks = data;
-            updateUI();
-        }
+        else { tasks = data; updateUI(); }
     }
 
     async function addTask() {
         const user = await supabase.auth.getUser();
-        const dateInput = document.getElementById('task-date').value;
-        const nameInput = document.getElementById('task-name').value;
-        const timeInput = parseInt(document.getElementById('task-time').value);
+        const date = document.getElementById('task-date').value;
+        const name = document.getElementById('task-name').value;
+        const time = parseInt(document.getElementById('task-time').value);
 
-        if (!dateInput || !nameInput || !timeInput) return;
-
-        const { error } = await supabase.from('tasks').insert([
-            { user_id: user.data.user.id, date: dateInput, name: nameInput, time: timeInput }
-        ]);
-
-        if (error) alert(error.message);
-        else {
-            document.getElementById('task-name').value = '';
-            document.getElementById('task-time').value = '';
-            fetchTasks();
-        }
+        const { error } = await supabase.from('tasks').insert([{ user_id: user.data.user.id, date, name, time }]);
+        if (error) alert(error.message); else fetchTasks();
     }
 
-    // 4. APP INITIALIZATION
+    // 4. Initialization
     supabase.auth.onAuthStateChange((event, session) => {
         if (session) {
             document.getElementById('auth-overlay').classList.add('hidden');
@@ -284,16 +271,10 @@
 
     function updateUI() {
         const tbody = document.getElementById('table-body');
-        const scoreDisplay = document.getElementById('total-score-display');
         tbody.innerHTML = '';
-        let totalScore = 0;
-
-        tasks.forEach(task => {
-            const points = task.time < 15 ? 5 : Math.floor(task.time / 2);
-            totalScore += points;
-            tbody.innerHTML += `<tr><td>${task.date}</td><td>${task.name}</td><td>${task.time}</td><td>+${points}</td></tr>`;
+        tasks.forEach(t => {
+            tbody.innerHTML += `<tr><td>${t.date}</td><td>${t.name}</td><td>${t.time}</td><td>+${t.time < 15 ? 5 : Math.floor(t.time/2)}</td></tr>`;
         });
-        scoreDisplay.textContent = totalScore;
     }
 </script>
 </body>
