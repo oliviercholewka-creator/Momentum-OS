@@ -17,7 +17,7 @@
 
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:white;font-family:sans-serif;}
-.container{max-width:900px;margin:auto;padding:40px 20px;}
+.container{max-width:900px;margin:auto;padding:40px 20px;display:none;}
 .entry-section{background:var(--card);padding:20px;border-radius:12px;margin-bottom:20px;border:1px solid var(--border);display:flex;gap:10px;}
 input{background:#1c1c20;border:1px solid var(--border);color:white;padding:10px;border-radius:6px;}
 button{background:var(--accent);color:white;border:none;padding:10px 15px;border-radius:6px;cursor:pointer;}
@@ -31,28 +31,24 @@ th,td{padding:12px;border-bottom:1px solid var(--border);}
 </head>
 <body>
 
-<!-- Auth Overlay -->
 <div id="auth-overlay">
   <div class="auth-card">
     <h2 id="auth-title">Login</h2>
     <input id="auth-email" type="email" placeholder="Email">
     <input id="auth-password" type="password" placeholder="Password">
-    <button onclick="handleAuth()">Continue</button>
+    <button id="auth-button" onclick="handleAuth()">Continue</button>
     <p id="toggle-text" style="margin-top:15px;cursor:pointer;color:#6366f1;" onclick="toggleAuthMode()">Don't have an account? Sign Up</p>
   </div>
 </div>
 
-<!-- Main Container -->
 <div class="container">
   <h1>Momentum OS</h1>
-
   <div class="entry-section">
     <input type="date" id="task-date">
     <input type="text" id="task-name" placeholder="Task">
     <input type="number" id="task-time" placeholder="Minutes">
     <button onclick="addTask()">Log</button>
   </div>
-
   <table>
     <thead>
       <tr><th>Date</th><th>Task</th><th>Time</th><th>Momentum</th></tr>
@@ -70,42 +66,45 @@ const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let isSignUp = false;
 let tasks = [];
 
-// Toggle between Login & SignUp
 function toggleAuthMode(){
   isSignUp = !isSignUp;
-  document.getElementById("auth-title").innerText = isSignUp ? "Create Account" : "Login";
+  document.getElementById("auth-title").innerText = isSignUp ? "Sign Up" : "Login";
   document.getElementById("toggle-text").innerText = isSignUp ? "Already have an account? Login" : "Don't have an account? Sign Up";
 }
 
-// Handle Login / Signup
 async function handleAuth(){
-  const email = document.getElementById("auth-email").value;
-  const password = document.getElementById("auth-password").value;
-  if(!email || !password){ alert("Enter email & password"); return; }
+  const email = document.getElementById("auth-email").value.trim();
+  const password = document.getElementById("auth-password").value.trim();
+  if(!email || !password){ alert("Please enter email and password."); return; }
 
   if(isSignUp){
-    const {error} = await supabase.auth.signUp({email,password});
-    if(error) alert(error.message);
-    else alert("Account created! Check email for confirmation.");
+    const {data, error} = await supabase.auth.signUp({email,password});
+    if(error){ alert(error.message); return; }
+    alert("Account created! Check your email for confirmation.");
   } else {
     const {data, error} = await supabase.auth.signInWithPassword({email,password});
     if(error){ alert(error.message); return; }
+    if(data.user){ showMainUI(); }
   }
 }
 
-// Fetch tasks from Supabase
+function showMainUI(){
+  document.getElementById("auth-overlay").classList.add("hidden");
+  document.querySelector(".container").style.display = "block";
+  fetchTasks();
+}
+
 async function fetchTasks(){
   const {data:userData} = await supabase.auth.getUser();
   if(!userData.user) return;
 
   const {data,error} = await supabase.from("tasks").select("*").eq("user_id",userData.user.id).order("date",{ascending:false});
-  if(error) console.error(error);
-  else tasks = data;
+  if(error){ console.error(error); return; }
 
+  tasks = data;
   updateUI();
 }
 
-// Add task to Supabase
 async function addTask(){
   const {data:userData} = await supabase.auth.getUser();
   if(!userData.user){ alert("Please login first."); return; }
@@ -113,7 +112,7 @@ async function addTask(){
   const date = document.getElementById("task-date").value;
   const name = document.getElementById("task-name").value;
   const time = parseInt(document.getElementById("task-time").value);
-  if(!date || !name || !time){ alert("Fill all fields"); return; }
+  if(!date || !name || !time){ alert("Fill all fields."); return; }
 
   const {error} = await supabase.from("tasks").insert([{user_id:userData.user.id,date,name,time}]);
   if(error){ alert(error.message); return; }
@@ -124,35 +123,22 @@ async function addTask(){
   document.getElementById("task-time").value="";
 }
 
-// Update UI table
+// Update table
 function updateUI(){
   const tbody = document.getElementById("table-body");
-  tbody.innerHTML = "";
+  tbody.innerHTML="";
   tasks.forEach(t=>{
     const score = t.time < 15 ? 5 : Math.floor(t.time/2);
     tbody.innerHTML += `<tr><td>${t.date}</td><td>${t.name}</td><td>${t.time}</td><td>+${score}</td></tr>`;
   });
 }
 
-// Show main UI on auth state change
-supabase.auth.onAuthStateChange((event, session)=>{
-  if(session && session.user){
-    document.getElementById("auth-overlay").classList.add("hidden");
-    fetchTasks();
-  }
-});
-
 // Check session on load
 async function checkSession(){
   const {data} = await supabase.auth.getSession();
-  if(data.session && data.session.user){
-    document.getElementById("auth-overlay").classList.add("hidden");
-    fetchTasks();
-  }
+  if(data.session && data.session.user){ showMainUI(); }
 }
-
 checkSession();
 </script>
-
 </body>
 </html>
