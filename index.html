@@ -3,293 +3,155 @@
 <head>
 <meta charset="UTF-8">
 <title>Momentum OS</title>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
-
 :root{
---bg:#0c0c0e;
---card:#141417;
---border:#232326;
---accent:#6366f1;
---accent-glow:rgba(99,102,241,0.2);
---text-primary:#ffffff;
---text-secondary:#94a3b8;
+  --bg:#0c0c0e;
+  --card:#141417;
+  --border:#232326;
+  --accent:#6366f1;
+  --accent-glow:rgba(99,102,241,0.2);
+  --text-primary:#ffffff;
+  --text-secondary:#94a3b8;
 }
 
 *{margin:0;padding:0;box-sizing:border-box;}
-
-body{
-background:var(--bg);
-color:white;
-font-family:sans-serif;
-}
-
-.container{
-max-width:900px;
-margin:auto;
-padding:40px 20px;
-}
-
-.entry-section{
-background:var(--card);
-padding:20px;
-border-radius:12px;
-margin-bottom:20px;
-border:1px solid var(--border);
-display:flex;
-gap:10px;
-}
-
-input{
-background:#1c1c20;
-border:1px solid var(--border);
-color:white;
-padding:10px;
-border-radius:6px;
-}
-
-button{
-background:var(--accent);
-color:white;
-border:none;
-padding:10px 15px;
-border-radius:6px;
-cursor:pointer;
-}
-
-table{
-width:100%;
-border-collapse:collapse;
-background:var(--card);
-border:1px solid var(--border);
-}
-
-th,td{
-padding:12px;
-border-bottom:1px solid var(--border);
-}
-
-.hidden{
-display:none;
-}
-
-#auth-overlay{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.9);
-display:flex;
-align-items:center;
-justify-content:center;
-}
-
-.auth-card{
-background:var(--card);
-padding:40px;
-border-radius:12px;
-width:350px;
-}
-
-.auth-card input{
-width:100%;
-margin-bottom:10px;
-}
-
+body{background:var(--bg);color:white;font-family:sans-serif;}
+.container{max-width:900px;margin:auto;padding:40px 20px;}
+.entry-section{background:var(--card);padding:20px;border-radius:12px;margin-bottom:20px;border:1px solid var(--border);display:flex;gap:10px;}
+input{background:#1c1c20;border:1px solid var(--border);color:white;padding:10px;border-radius:6px;}
+button{background:var(--accent);color:white;border:none;padding:10px 15px;border-radius:6px;cursor:pointer;}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--border);}
+th,td{padding:12px;border-bottom:1px solid var(--border);}
+.hidden{display:none;}
+#auth-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;}
+.auth-card{background:var(--card);padding:40px;border-radius:12px;width:350px;}
+.auth-card input{width:100%;margin-bottom:10px;}
 </style>
 </head>
-
 <body>
 
+<!-- Auth Overlay -->
 <div id="auth-overlay">
-<div class="auth-card">
-
-<h2 id="auth-title">Login</h2>
-
-<input id="auth-email" type="email" placeholder="Email">
-<input id="auth-password" type="password" placeholder="Password">
-
-<button onclick="handleAuth()">Continue</button>
-
-<p id="toggle-text" style="margin-top:15px;cursor:pointer;color:#6366f1;" onclick="toggleAuthMode()">
-Don't have an account? Sign Up
-</p>
-
-</div>
+  <div class="auth-card">
+    <h2 id="auth-title">Login</h2>
+    <input id="auth-email" type="email" placeholder="Email">
+    <input id="auth-password" type="password" placeholder="Password">
+    <button onclick="handleAuth()">Continue</button>
+    <p id="toggle-text" style="margin-top:15px;cursor:pointer;color:#6366f1;" onclick="toggleAuthMode()">Don't have an account? Sign Up</p>
+  </div>
 </div>
 
-
+<!-- Main Container -->
 <div class="container">
+  <h1>Momentum OS</h1>
 
-<h1>Momentum OS</h1>
+  <div class="entry-section">
+    <input type="date" id="task-date">
+    <input type="text" id="task-name" placeholder="Task">
+    <input type="number" id="task-time" placeholder="Minutes">
+    <button onclick="addTask()">Log</button>
+  </div>
 
-<div class="entry-section">
-<input type="date" id="task-date">
-<input type="text" id="task-name" placeholder="Task">
-<input type="number" id="task-time" placeholder="Minutes">
-<button onclick="addTask()">Log</button>
-</div>
-
-<table>
-<thead>
-<tr>
-<th>Date</th>
-<th>Task</th>
-<th>Time</th>
-<th>Momentum</th>
-</tr>
-</thead>
-<tbody id="table-body"></tbody>
-</table>
-
+  <table>
+    <thead>
+      <tr><th>Date</th><th>Task</th><th>Time</th><th>Momentum</th></tr>
+    </thead>
+    <tbody id="table-body"></tbody>
+  </table>
 </div>
 
 <script>
+const SUPABASE_URL = "https://gmyveydvfikustdfsndv.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdteXZleWR2ZmlrdXN0ZGZzbmR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNjIzOTIsImV4cCI6MjA4ODgzODM5Mn0.Qt90bt8OOAb1u26cEupc7HSY50Yz4OaDYWlOhNPOR-M";
 
-const SUPABASE_URL = "https://gmyveydvfikustdfsndv.supabase.co"
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdteXZleWR2ZmlrdXN0ZGZzbmR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNjIzOTIsImV4cCI6MjA4ODgzODM5Mn0.Qt90bt8OOAb1u26cEupc7HSY50Yz4OaDYWlOhNPOR-M"
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+let isSignUp = false;
+let tasks = [];
 
-let isSignUp = false
-let tasks = []
-
+// Toggle between Login & SignUp
 function toggleAuthMode(){
-
-isSignUp = !isSignUp
-
-document.getElementById("auth-title").innerText =
-isSignUp ? "Create Account" : "Login"
-
-document.getElementById("toggle-text").innerText =
-isSignUp ? "Already have an account? Login" : "Don't have an account? Sign Up"
-
+  isSignUp = !isSignUp;
+  document.getElementById("auth-title").innerText = isSignUp ? "Create Account" : "Login";
+  document.getElementById("toggle-text").innerText = isSignUp ? "Already have an account? Login" : "Don't have an account? Sign Up";
 }
 
+// Handle Login / Signup
 async function handleAuth(){
+  const email = document.getElementById("auth-email").value;
+  const password = document.getElementById("auth-password").value;
+  if(!email || !password){ alert("Enter email & password"); return; }
 
-const email = document.getElementById("auth-email").value
-const password = document.getElementById("auth-password").value
-
-if(isSignUp){
-
-const {error} = await supabaseClient.auth.signUp({
-email:email,
-password:password
-})
-
-if(error) alert(error.message)
-else alert("Account created. Check email for confirmation.")
-
-}else{
-
-const {error} = await supabaseClient.auth.signInWithPassword({
-email:email,
-password:password
-})
-
-if(error) alert(error.message)
-
+  if(isSignUp){
+    const {error} = await supabase.auth.signUp({email,password});
+    if(error) alert(error.message);
+    else alert("Account created! Check email for confirmation.");
+  } else {
+    const {data, error} = await supabase.auth.signInWithPassword({email,password});
+    if(error){ alert(error.message); return; }
+  }
 }
 
-}
-
+// Fetch tasks from Supabase
 async function fetchTasks(){
+  const {data:userData} = await supabase.auth.getUser();
+  if(!userData.user) return;
 
-const {data:userData} = await supabaseClient.auth.getUser()
+  const {data,error} = await supabase.from("tasks").select("*").eq("user_id",userData.user.id).order("date",{ascending:false});
+  if(error) console.error(error);
+  else tasks = data;
 
-const {data,error} = await supabaseClient
-.from("tasks")
-.select("*")
-.eq("user_id",userData.user.id)
-.order("date",{ascending:false})
-
-if(error) console.error(error)
-
-tasks = data
-
-updateUI()
-
+  updateUI();
 }
 
+// Add task to Supabase
 async function addTask(){
+  const {data:userData} = await supabase.auth.getUser();
+  if(!userData.user){ alert("Please login first."); return; }
 
-const {data:userData} = await supabaseClient.auth.getUser()
+  const date = document.getElementById("task-date").value;
+  const name = document.getElementById("task-name").value;
+  const time = parseInt(document.getElementById("task-time").value);
+  if(!date || !name || !time){ alert("Fill all fields"); return; }
 
-const date = document.getElementById("task-date").value
-const name = document.getElementById("task-name").value
-const time = parseInt(document.getElementById("task-time").value)
+  const {error} = await supabase.from("tasks").insert([{user_id:userData.user.id,date,name,time}]);
+  if(error){ alert(error.message); return; }
 
-const {error} = await supabaseClient.from("tasks").insert([{
-user_id:userData.user.id,
-date:date,
-name:name,
-time:time
-}])
-
-if(error){
-alert(error.message)
-return
+  fetchTasks();
+  document.getElementById("task-date").value="";
+  document.getElementById("task-name").value="";
+  document.getElementById("task-time").value="";
 }
 
-fetchTasks()
-
-}
-
+// Update UI table
 function updateUI(){
-
-const tbody = document.getElementById("table-body")
-
-tbody.innerHTML=""
-
-tasks.forEach(t=>{
-
-const score = t.time < 15 ? 5 : Math.floor(t.time/2)
-
-tbody.innerHTML += `
-<tr>
-<td>${t.date}</td>
-<td>${t.name}</td>
-<td>${t.time}</td>
-<td>+${score}</td>
-</tr>
-`
-
-})
-
+  const tbody = document.getElementById("table-body");
+  tbody.innerHTML = "";
+  tasks.forEach(t=>{
+    const score = t.time < 15 ? 5 : Math.floor(t.time/2);
+    tbody.innerHTML += `<tr><td>${t.date}</td><td>${t.name}</td><td>${t.time}</td><td>+${score}</td></tr>`;
+  });
 }
 
-supabaseClient.auth.onAuthStateChange((event,session)=>{
+// Show main UI on auth state change
+supabase.auth.onAuthStateChange((event, session)=>{
+  if(session && session.user){
+    document.getElementById("auth-overlay").classList.add("hidden");
+    fetchTasks();
+  }
+});
 
-if(session){
-
-document.getElementById("auth-overlay").classList.add("hidden")
-
-fetchTasks()
-
-}
-
-})
-
+// Check session on load
 async function checkSession(){
-
-const {data} = await supabaseClient.auth.getSession()
-
-if(data.session){
-
-document.getElementById("auth-overlay").classList.add("hidden")
-
-fetchTasks()
-
+  const {data} = await supabase.auth.getSession();
+  if(data.session && data.session.user){
+    document.getElementById("auth-overlay").classList.add("hidden");
+    fetchTasks();
+  }
 }
 
-}
-
-checkSession()
-
+checkSession();
 </script>
 
 </body>
