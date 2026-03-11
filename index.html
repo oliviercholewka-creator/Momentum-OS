@@ -299,110 +299,160 @@
 </div>
 
 <script>
-    // --- NEW PERSISTENCE LOGIC ---
+let timeLeft = 1500;
+let timerId = null;
+let sessionsCompleted = 0;
 
-// Load data when the window opens
+// LOAD SAVED DATA
 window.onload = () => {
-    const savedActions = JSON.parse(localStorage.getItem('minActions')) || [];
-    const savedIdentity = localStorage.getItem('userIdentity') || "";
-    
-    // Restore Actions
-    const tbody = document.getElementById('min-action-body');
-    savedActions.forEach(item => {
-        tbody.innerHTML += `<tr><td>${item.goal}</td><td><span class="tag">${item.action}</span></td></tr>`;
-    });
 
     // Restore Identity
-    if(savedIdentity) {
+    const savedIdentity = localStorage.getItem('userIdentity');
+    if (savedIdentity) {
         document.getElementById('identity-select').value = savedIdentity;
         updateIdentity();
     }
+
+    // Restore Minimum Actions
+    const savedActions = JSON.parse(localStorage.getItem('minActions'));
+    if (savedActions && savedActions.length > 0) {
+        const tbody = document.getElementById('min-action-body');
+        tbody.innerHTML = "";
+
+        savedActions.forEach(item => {
+            tbody.innerHTML += `
+            <tr>
+                <td>${item.goal}</td>
+                <td><span class="tag">${item.action}</span></td>
+            </tr>`;
+        });
+    }
+
+    updateTimerDisplay();
 };
 
-// Updated Identity Function
+// IDENTITY SYSTEM
 function updateIdentity() {
     const select = document.getElementById('identity-select');
     const banner = document.getElementById('identity-banner');
-    if(select.value) {
-        banner.innerHTML = `You are acting as a <b style="color:var(--accent)">${select.value}</b> today.`;
-        localStorage.setItem('userIdentity', select.value); // Save to browser
+
+    if (select.value) {
+        banner.innerHTML =
+            `You are acting as a <b style="color:var(--accent)">${select.value}</b> today.`;
+        localStorage.setItem('userIdentity', select.value);
+    } else {
+        banner.textContent = "Select your identity to begin...";
+        localStorage.removeItem('userIdentity');
     }
 }
 
-// Updated Add Row Function
+// MINIMUM ACTION SYSTEM
 function addRow() {
-    const goal = document.getElementById('new-goal').value;
-    const action = document.getElementById('new-action').value;
+
+    const goal = document.getElementById('new-goal').value.trim();
+    const action = document.getElementById('new-action').value.trim();
+
     if (!goal || !action) return;
 
     const tbody = document.getElementById('min-action-body');
-    tbody.innerHTML += `<tr><td>${goal}</td><td><span class="tag">${action}</span></td></tr>`;
 
-    // Save to LocalStorage
-    const currentActions = JSON.parse(localStorage.getItem('minActions')) || [];
-    currentActions.push({ goal, action });
-    localStorage.setItem('minActions', JSON.stringify(currentActions));
+    tbody.innerHTML += `
+    <tr>
+        <td>${goal}</td>
+        <td><span class="tag">${action}</span></td>
+    </tr>`;
 
-    document.getElementById('new-goal').value = '';
-    document.getElementById('new-action').value = '';
+    const saved = JSON.parse(localStorage.getItem('minActions')) || [];
+    saved.push({ goal, action });
+
+    localStorage.setItem('minActions', JSON.stringify(saved));
+
+    document.getElementById('new-goal').value = "";
+    document.getElementById('new-action').value = "";
 }
 
-let timeLeft = 1500; 
-let timerId = null;
+// TIMER
+function updateTimerDisplay() {
 
-    function updateTimerDisplay() {
-        const mins = Math.floor(timeLeft / 60);
-        const secs = timeLeft % 60;
-        document.getElementById('timer-display').textContent = 
-            `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    }
+    const mins = Math.floor(timeLeft / 60);
+    const secs = timeLeft % 60;
 
-    function toggleTimer() {
-        const btn = document.getElementById('start-btn');
-        const card = document.getElementById('execution-card');
+    document.getElementById('timer-display').textContent =
+        `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
 
-        if (timerId) {
-            clearInterval(timerId);
-            timerId = null;
-            btn.textContent = "Start Focus Session";
-            card.classList.remove('active-session');
-        } else {
-            card.classList.add('active-session');
-            btn.textContent = "Pause Session";
-            timerId = setInterval(() => {
-                timeLeft--;
-                updateTimerDisplay();
-                if (timeLeft <= 0) {
-                    clearInterval(timerId);
-                    alert("Focus session complete! Take a break.");
-                }
-            }, 1000);
-        }
-    }
+function toggleTimer() {
 
-    function resetTimer() {
+    const btn = document.getElementById('start-btn');
+    const card = document.getElementById('execution-card');
+
+    if (timerId) {
+
         clearInterval(timerId);
         timerId = null;
-        timeLeft = 1500;
-        updateTimerDisplay();
-        document.getElementById('start-btn').textContent = "Start Focus Session";
-        document.getElementById('execution-card').classList.remove('active-session');
-    }
 
-    // Anti-Procrastination Solver
-    function showHelp() {
-        document.getElementById('procrastination-panel').style.display = 'block';
-    }
+        btn.textContent = "Start Focus Session";
+        card.classList.remove('active-session');
 
-    function solve(type) {
-        const output = document.getElementById('solver-output');
-        const tips = {
-            hard: "Set a timer for 5 minutes and commit to doing the 'ugly version' of the task.",
-            boring: "Gamify it: How many of these can you finish in 10 minutes? Put on high-tempo music.",
-            overwhelmed: "Close your eyes. Identify just ONE sub-task that takes less than 60 seconds. Do only that."
-        };
-        output.textContent = tips[type];
+    } else {
+
+        btn.textContent = "Pause Session";
+        card.classList.add('active-session');
+
+        timerId = setInterval(() => {
+
+            timeLeft--;
+            updateTimerDisplay();
+
+            if (timeLeft <= 0) {
+
+                clearInterval(timerId);
+                timerId = null;
+
+                sessionsCompleted++;
+
+                document.querySelector(".card.col-4 p:nth-child(2)").textContent =
+                    sessionsCompleted + " Sessions";
+
+                alert("Focus session complete!");
+
+                resetTimer();
+            }
+
+        }, 1000);
     }
+}
+
+function resetTimer() {
+
+    clearInterval(timerId);
+    timerId = null;
+
+    timeLeft = 1500;
+
+    updateTimerDisplay();
+
+    document.getElementById('start-btn').textContent = "Start Focus Session";
+    document.getElementById('execution-card').classList.remove('active-session');
+}
+
+// PROCRASTINATION SOLVER
+function showHelp() {
+    document.getElementById('procrastination-panel').style.display = "block";
+}
+
+function solve(type) {
+
+    const output = document.getElementById('solver-output');
+
+    const tips = {
+        hard: "Do the ugly version for 5 minutes. Momentum beats perfection.",
+        boring: "Turn it into a speed challenge: how much can you finish in 10 minutes?",
+        overwhelmed: "Break the task down until the first step takes under 60 seconds."
+    };
+
+    output.textContent = tips[type];
+}
 </script>
 
 </body>
