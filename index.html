@@ -1,469 +1,282 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Momentum OS</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Momentum OS | Deep Work Engine</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0c0c0e;
+            --card: #141417;
+            --border: #232326;
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.2);
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --success: #10b981;
+        }
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-<style>
+        body {
+            background-color: var(--bg);
+            color: var(--text-primary);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            padding-bottom: 100px;
+        }
 
-:root{
---bg:#09090b;
---card-bg:#18181b;
---border:#27272a;
---text:#fafafa;
---text-dim:#a1a1aa;
---accent:#3b82f6;
---success:#10b981;
-}
+        .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
 
-*{box-sizing:border-box;margin:0;padding:0;}
+        /* Header UI */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 60px;
+        }
 
-body{
-font-family:Inter,sans-serif;
-background:var(--bg);
-color:var(--text);
-padding:40px 20px;
-}
+        .logo-area h1 { font-weight: 800; font-size: 1.8rem; letter-spacing: -1px; }
+        .logo-area p { color: var(--text-secondary); font-size: 0.9rem; }
 
-.container{
-max-width:1100px;
-margin:auto;
-}
+        .total-momentum {
+            text-align: right;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-header{
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:40px;
-border-bottom:1px solid var(--border);
-padding-bottom:20px;
-}
+        /* The Entry Card */
+        .entry-section {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
 
-.grid{
-display:grid;
-grid-template-columns:repeat(12,1fr);
-gap:20px;
-}
+        .input-group {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr 1fr 100px;
+            gap: 15px;
+            align-items: end;
+        }
 
-.card{
-background:var(--card-bg);
-border:1px solid var(--border);
-border-radius:12px;
-padding:24px;
-}
+        label { display: block; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
 
-.col-8{grid-column:span 8;}
-.col-6{grid-column:span 6;}
-.col-4{grid-column:span 4;}
-.col-12{grid-column:span 12;}
+        input {
+            background: #1c1c20;
+            border: 1px solid var(--border);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            outline: none;
+            width: 100%;
+            transition: border-color 0.2s;
+        }
 
-h2{margin-bottom:15px;}
+        input:focus { border-color: var(--accent); }
 
-table{
-width:100%;
-border-collapse:collapse;
-}
+        button#log-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
 
-th,td{
-padding:10px 0;
-border-top:1px solid var(--border);
-text-align:left;
-}
+        button#log-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
 
-input,select,textarea{
-background:#09090b;
-border:1px solid var(--border);
-color:white;
-padding:8px;
-border-radius:6px;
-width:100%;
-margin-bottom:10px;
-}
+        /* Table UI */
+        .table-container {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
 
-button{
-background:var(--accent);
-border:none;
-padding:10px 14px;
-color:white;
-border-radius:6px;
-cursor:pointer;
-}
+        table { width: 100%; border-collapse: collapse; }
 
-.btn-outline{
-background:none;
-border:1px solid var(--border);
-}
+        th {
+            background: #1c1c20;
+            text-align: left;
+            padding: 15px 20px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
 
-.progress-bar{
-height:6px;
-background:var(--border);
-border-radius:10px;
-overflow:hidden;
-}
+        td {
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
 
-.progress-fill{
-height:100%;
-background:var(--accent);
-}
+        tr:last-child td { border-bottom: none; }
 
-#timer-display{
-font-size:3rem;
-text-align:center;
-margin:20px 0;
-}
+        .tag-points {
+            background: var(--accent-glow);
+            color: var(--accent);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
 
-.active-session{
-border-color:var(--accent);
-box-shadow:0 0 20px rgba(59,130,246,.4);
-}
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
 
-.tag{
-background:var(--border);
-padding:4px 8px;
-border-radius:4px;
-font-size:.75rem;
-}
+        /* Animations */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-@media(max-width:768px){
-.col-4,.col-6,.col-8{grid-column:span 12;}
-}
+        .row-animate { animation: slideUp 0.4s ease forwards; }
 
-</style>
+    </style>
 </head>
-
 <body>
 
 <div class="container">
+    <header>
+        <div class="logo-area">
+            <h1>MOMENTUM OS</h1>
+            <p>System status: <span style="color: var(--success)">Optimal</span></p>
+        </div>
+        <div class="total-momentum">
+            <p style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-secondary); -webkit-text-fill-color: initial;">Total Score</p>
+            <h2 id="total-score-display" style="font-size: 2.5rem;">0</h2>
+        </div>
+    </header>
 
-<header>
+    <div class="entry-section">
+        <div class="input-group">
+            <div>
+                <label>Date</label>
+                <input type="date" id="task-date">
+            </div>
+            <div>
+                <label>Task Name</label>
+                <input type="text" id="task-name" placeholder="E.g. Database Design">
+            </div>
+            <div>
+                <label>Minutes</label>
+                <input type="number" id="task-time" placeholder="Mins">
+            </div>
+            <button id="log-btn" onclick="addTask()">LOG</button>
+        </div>
+    </div>
 
-<div>
-<h1>MOMENTUM OS</h1>
-<p id="identity-banner" style="color:var(--text-dim);font-size:.9rem;">
-Select your identity to begin...
-</p>
-</div>
-
-<select id="identity-select" onchange="updateIdentity()">
-<option value="">Choose Identity</option>
-<option>Builder</option>
-<option>Scholar</option>
-<option>Athlete</option>
-<option>Trader</option>
-</select>
-
-</header>
-
-<div class="grid">
-
-<!-- MOMENTUM TRACKER -->
-
-<div class="card col-8">
-
-<h2>Momentum Tracker</h2>
-
-<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
-
-<input id="momentum-date" type="date">
-<input id="momentum-tasks" type="number" placeholder="Tasks completed">
-<input id="momentum-score" type="number" placeholder="Momentum score">
-
-<button onclick="addMomentum()">Add Entry</button>
-<button class="btn-outline" onclick="setToday()">Today</button>
-
-</div>
-
-<table>
-
-<thead>
-<tr>
-<th>Date</th>
-<th>Tasks</th>
-<th>Score</th>
-</tr>
-</thead>
-
-<tbody id="momentum-body"></tbody>
-
-</table>
-
-</div>
-
-<!-- LIFE DASHBOARD -->
-
-<div class="card col-4">
-
-<h2>Life Dashboard</h2>
-
-<p>Health</p>
-<div class="progress-bar"><div class="progress-fill" style="width:70%"></div></div>
-
-<p style="margin-top:10px">Learning</p>
-<div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
-
-<p style="margin-top:10px">Work</p>
-<div class="progress-bar"><div class="progress-fill" style="width:90%"></div></div>
-
-</div>
-
-<!-- EXECUTION -->
-
-<div class="card col-6" id="execution-card">
-
-<h2>Today's Execution</h2>
-
-<input placeholder="1. High impact task">
-<input placeholder="2. Secondary objective">
-<input placeholder="3. Maintenance task">
-
-<div id="timer-display">25:00</div>
-
-<div style="display:flex;gap:10px">
-<button id="start-btn" onclick="toggleTimer()">Start Focus Session</button>
-<button class="btn-outline" onclick="resetTimer()">Reset</button>
-</div>
-
-</div>
-
-<!-- FOCUS ROOM -->
-
-<div class="card col-6">
-
-<h2>Focus Room</h2>
-
-<p>Completed Today</p>
-<p id="session-count" style="font-size:2rem">0 Sessions</p>
-
-</div>
-
-<!-- MINIMUM ACTION -->
-
-<div class="card col-12">
-
-<h2>Minimum Action System</h2>
-
-<table>
-
-<thead>
-<tr>
-<th>Goal</th>
-<th>Minimum Action</th>
-</tr>
-</thead>
-
-<tbody id="min-action-body"></tbody>
-
-</table>
-
-<div style="display:flex;gap:10px;margin-top:10px">
-
-<input id="new-goal" placeholder="Goal">
-<input id="new-action" placeholder="Minimum Action">
-
-<button onclick="addRow()">Add</button>
-
-</div>
-
-</div>
-
-</div>
+    <div class="table-container">
+        <table id="momentum-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Task</th>
+                    <th>Time</th>
+                    <th>Momentum</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                </tbody>
+        </table>
+        <div id="empty-msg" class="empty-state">No execution logs found. Start working to build momentum.</div>
+    </div>
 </div>
 
 <script>
-
-let timeLeft=1500
-let timerId=null
-let sessionsCompleted=0
-
-window.onload=()=>{
-
-renderMomentum()
-
-const savedIdentity=localStorage.getItem("userIdentity")
-
-if(savedIdentity){
-document.getElementById("identity-select").value=savedIdentity
-updateIdentity()
-}
-
-const savedActions=JSON.parse(localStorage.getItem("minActions"))||[]
-
-const tbody=document.getElementById("min-action-body")
-
-savedActions.forEach(a=>{
-tbody.innerHTML+=`
-<tr>
-<td>${a.goal}</td>
-<td><span class="tag">${a.action}</span></td>
-</tr>`
-})
-
-updateTimerDisplay()
-
-}
-
-function updateIdentity(){
-
-const select=document.getElementById("identity-select")
-const banner=document.getElementById("identity-banner")
-
-if(select.value){
-
-banner.innerHTML=`You are acting as a <b style="color:#3b82f6">${select.value}</b> today.`
-
-localStorage.setItem("userIdentity",select.value)
-
-}else{
-
-banner.innerText="Select your identity to begin..."
-localStorage.removeItem("userIdentity")
-
-}
-
-}
-
-function addRow(){
-
-const goal=document.getElementById("new-goal").value.trim()
-const action=document.getElementById("new-action").value.trim()
-
-if(!goal||!action)return
-
-const saved=JSON.parse(localStorage.getItem("minActions"))||[]
-
-saved.push({goal,action})
-
-localStorage.setItem("minActions",JSON.stringify(saved))
-
-location.reload()
-
-}
-
-function updateTimerDisplay(){
-
-const mins=Math.floor(timeLeft/60)
-const secs=timeLeft%60
-
-document.getElementById("timer-display").textContent=
-`${mins.toString().padStart(2,"0")}:${secs.toString().padStart(2,"0")}`
-
-}
-
-function toggleTimer(){
-
-const btn=document.getElementById("start-btn")
-const card=document.getElementById("execution-card")
-
-if(timerId){
-
-clearInterval(timerId)
-timerId=null
-btn.textContent="Start Focus Session"
-card.classList.remove("active-session")
-
-}else{
-
-btn.textContent="Pause Session"
-card.classList.add("active-session")
-
-timerId=setInterval(()=>{
-
-timeLeft--
-updateTimerDisplay()
-
-if(timeLeft<=0){
-
-clearInterval(timerId)
-timerId=null
-
-sessionsCompleted++
-
-document.getElementById("session-count").textContent=
-sessionsCompleted+" Sessions"
-
-alert("Focus session complete!")
-
-resetTimer()
-
-}
-
-},1000)
-
-}
-
-}
-
-function resetTimer(){
-
-clearInterval(timerId)
-timerId=null
-timeLeft=1500
-updateTimerDisplay()
-
-document.getElementById("execution-card").classList.remove("active-session")
-document.getElementById("start-btn").textContent="Start Focus Session"
-
-}
-
-function setToday(){
-
-const today=new Date().toISOString().split("T")[0]
-
-document.getElementById("momentum-date").value=today
-
-}
-
-function addMomentum(){
-
-const date=document.getElementById("momentum-date").value
-const tasks=document.getElementById("momentum-tasks").value
-const score=document.getElementById("momentum-score").value
-
-if(!date||!tasks||!score)return
-
-const stored=JSON.parse(localStorage.getItem("momentumData"))||[]
-
-stored.push({date,tasks,score})
-
-stored.sort((a,b)=>new Date(b.date)-new Date(a.date))
-
-localStorage.setItem("momentumData",JSON.stringify(stored))
-
-renderMomentum()
-
-document.getElementById("momentum-tasks").value=""
-document.getElementById("momentum-score").value=""
-
-}
-
-function renderMomentum(){
-
-const tbody=document.getElementById("momentum-body")
-
-tbody.innerHTML=""
-
-const stored=JSON.parse(localStorage.getItem("momentumData"))||[]
-
-stored.forEach(item=>{
-
-const date=new Date(item.date).toLocaleDateString()
-
-tbody.innerHTML+=`
-<tr>
-<td>${date}</td>
-<td>${item.tasks}</td>
-<td style="color:#10b981">+${item.score}</td>
-</tr>
-`
-
-})
-
-}
-
+    // Initialize State
+    let tasks = JSON.parse(localStorage.getItem('momentum_tasks')) || [];
+    let totalScore = 0;
+
+    // Set default date to today
+    document.getElementById('task-date').valueAsDate = new Date();
+
+    function calculatePoints(minutes) {
+        if (minutes <= 0) return 0;
+        // Logic: 5 base points + proportional growth
+        if (minutes < 15) return 5;
+        if (minutes < 60) return Math.floor(minutes / 2);
+        return Math.floor(30 + (minutes / 10)); // Deep work bonus
+    }
+
+    function updateUI() {
+        const tbody = document.getElementById('table-body');
+        const emptyMsg = document.getElementById('empty-msg');
+        const scoreDisplay = document.getElementById('total-score-display');
+        
+        tbody.innerHTML = '';
+        totalScore = 0;
+
+        if (tasks.length === 0) {
+            emptyMsg.style.display = 'block';
+        } else {
+            emptyMsg.style.display = 'none';
+        }
+
+        tasks.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        tasks.forEach((task, index) => {
+            const row = document.createElement('tr');
+            row.className = 'row-animate';
+            const points = calculatePoints(task.time);
+            totalScore += points;
+
+            row.innerHTML = `
+                <td style="color: var(--text-secondary)">${task.date}</td>
+                <td style="font-weight: 600">${task.name}</td>
+                <td>${task.time} mins</td>
+                <td><span class="tag-points">+${points}</span></td>
+            `;
+            tbody.appendChild(row);
+        });
+
+        scoreDisplay.textContent = totalScore;
+    }
+
+    function addTask() {
+        const dateInput = document.getElementById('task-date').value;
+        const nameInput = document.getElementById('task-name').value;
+        const timeInput = document.getElementById('task-time').value;
+
+        if (!dateInput || !nameInput || !timeInput) {
+            alert("Please fill all fields to generate momentum.");
+            return;
+        }
+
+        const newTask = {
+            date: dateInput,
+            name: nameInput,
+            time: parseInt(timeInput)
+        };
+
+        tasks.push(newTask);
+        localStorage.setItem('momentum_tasks', JSON.stringify(tasks));
+        
+        // Reset inputs
+        document.getElementById('task-name').value = '';
+        document.getElementById('task-time').value = '';
+        
+        updateUI();
+    }
+
+    // Initial Load
+    updateUI();
 </script>
 
 </body>
